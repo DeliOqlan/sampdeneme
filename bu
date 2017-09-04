@@ -1,0 +1,181 @@
+#define CPD 3							// Admin Panel Giriş Dialogu
+#define CPDD 11                         // Admin Paneli Giriş Dialogu (1lvl Adminler İçin!);
+#define DUYURU 4						// Admin Panel Duyuru Dialogu
+#define TAKIP 5							// Admin Panel İzleme Dialogu Dialogu
+#define GHDIALOG 6						// Admin Panel Genel Hile İşlem Dialogu
+#define KICK 7							// Admin Panel Oyundan Atma Dialogu
+#define BAND 8	                        // Admin Panel Yasaklama Dialogu
+#define DJYD 9	                        // Admin Panel DJ Yönetim Dialogu
+#define DJYAP 10                        // Admin Panel DJ Yap Dialogu
+
+CMD:cp(playerid, params[])
+{
+	if(PlayerInfo[playerid][pAdminLevel] < 1) return SendClientMessage(playerid, ERROR_COLOR_HD, "Bu komutu kullanabilmek için 1 level ve üstü admin olmalısın.");
+	if(PlayerInfo[playerid][pAdminLevel] == 1) return ShowPlayerDialog(playerid, CPDD,DIALOG_STYLE_LIST,"Admin Kontrol Panel","Duyuru Yap\nGH İşlemleri","Seç","İptal");
+	if(PlayerInfo[playerid][pAdminLevel] == 2) return ShowPlayerDialog(playerid, CPD,DIALOG_STYLE_LIST,"Admin Kontrol Panel","Duyuru Yap\nTakip","Seç","İptal");
+	if(PlayerInfo[playerid][pAdminLevel] == 3) return ShowPlayerDialog(playerid, CPD,DIALOG_STYLE_LIST,"Admin Kontrol Panel","Duyuru Yap\nTakip\nGH İşlemleri","Seç","İptal");
+	if(PlayerInfo[playerid][pAdminLevel] == 4) return ShowPlayerDialog(playerid, CPD,DIALOG_STYLE_LIST,"Admin Kontrol Panel","Duyuru Yap\nTakip\nGH İşlemleri\nDJ Yönetim","Seç","İptal");
+	if(PlayerInfo[playerid][pAdminLevel] == 5) return ShowPlayerDialog(playerid, CPD,DIALOG_STYLE_LIST,"Admin Kontrol Panel","Duyuru Yap\nTakip\nGH İşlemleri\nDJ Yönetim\nRehber Yönetim","Seç","İptal");
+	if(PlayerInfo[playerid][pAdminLevel] == 6) return ShowPlayerDialog(playerid, CPD,DIALOG_STYLE_LIST,"Admin Kontrol Panel","Duyuru Yap\nTakip\nGH İşlemleri\nDJ Yönetim\nRehber Yönetim\nAdmin Yönetim\nSunucu Ayarları","Seç","İptal");
+	return 1;
+}
+
+/*=========================== [CP} =========================*/
+if(dialogid == CPDD)
+{
+if(response)
+{
+if(listitem == 0)
+{
+new duyurudialogs[120];
+format(duyurudialogs,sizeof duyurudialogs,"Lütfen Duyurunuzu Giriniz.\n\nDuyurunuz Şu Şekilde Görünecektir.\n\n{004225}|| YETKİLİ ||: {faa009}Duyurunuz");
+ShowPlayerDialog(playerid, DUYURU,DIALOG_STYLE_INPUT,"Admin Kontrol Panel - Duyuru",duyurudialogs,"Tamam","İptal");
+}
+else if(listitem == 1)
+{
+new goddialog[120];
+format(goddialog,sizeof goddialog,"Oyuncu At\nOyuncu Banla");
+ShowPlayerDialog(playerid, GHDIALOG,DIALOG_STYLE_LIST,"Admin Kontrol Panel - Genel Hile İşlemleri",goddialog,"Tamam","İptal");
+}
+}
+}
+
+if(dialogid == CPD)
+{
+if(response)
+{
+if(listitem == 0)
+{
+new duyurudialogs[120];
+format(duyurudialogs,sizeof duyurudialogs,"Lütfen Duyurunuzu Giriniz.\n\nDuyurunuz Şu Şekilde Görünecektir.\n\n{004225}|| YETKİLİ ||: {faa009}Duyurunuz");
+ShowPlayerDialog(playerid, DUYURU,DIALOG_STYLE_INPUT,"Admin Kontrol Panel - Duyuru",duyurudialogs,"Tamam","İptal");
+}
+else if(listitem == 1)
+{
+new goddialog[120];
+format(goddialog,sizeof goddialog,"İzlemek İstediğiniz Oyuncunun ID Değerini Giriniz!");
+ShowPlayerDialog(playerid, TAKIP,DIALOG_STYLE_INPUT,"Admin Kontrol Panel - Eklentiler",goddialog,"Tamam","İptal");
+}
+else if(listitem == 2)
+{
+new goddialog[120];
+format(goddialog,sizeof goddialog,"Oyuncu At\nOyuncu Banla");
+ShowPlayerDialog(playerid, GHDIALOG,DIALOG_STYLE_LIST,"Admin Kontrol Panel - Genel Hile İşlemleri",goddialog,"Tamam","İptal");
+}
+}
+}
+
+if(dialogid == GHDIALOG)
+{
+if(response)
+{
+if(listitem == 0)
+{
+	new kick[100];
+	format(kick, sizeof kick,"Atmak İstediğiniz Oyuncunun ID Değerini Giriniz!");
+	ShowPlayerDialog(playerid, KICK, DIALOG_STYLE_INPUT,"Admin Kontrol Panel - Genel Hile İşlemleri",kick,"At","İptal");
+}
+else if(listitem == 1)
+{
+	new ban[100];
+	format(ban,sizeof ban,"Banlamak İstediğiniz Oyuncunun ID Değerini Giriniz!");
+	ShowPlayerDialog(playerid, BAND, DIALOG_STYLE_INPUT,"Admin Kontrol Panel - Genel Hile İşlemleri",ban,"Banla","İptal");
+}
+}
+}
+
+if(dialogid == BAND)
+{
+if(response)
+{
+	if(PlayerInfo[playerid][pAdminLevel] < 3) return SendClientMessage(playerid, ERROR_COLOR_HD, "Bu komutu kullanabilmek için 3 level ve üstü admin olmalısın.");
+	new xID,msj[250];
+	xID = strval(inputtext);
+	if(!IsPlayerConnected(xID)) return SendClientMessage(playerid,ERROR_COLOR_HD,"Sunucuda böyle bir ID yok !");
+	if(PlayerInfo[playerid][pAdminLevel] < PlayerInfo[xID][pAdminLevel]) return SendClientMessage(playerid, ERROR_COLOR_HD, "Yüksek level adminleri banlayamazsın !");
+	if(playerid == xID) return SendClientMessage(playerid,ERROR_COLOR_HD,"Kendinimi Banlayacaksın ?");
+	PlayerInfo[xID][pBan] = 1;
+	PlayerInfo[xID][pBanlayan] = getName(playerid);
+	format(msj,sizeof(msj),"[BAN] Yetkili %s, oyuncu %s sunucudan banladı.",getName(playerid),getName(xID));
+	SendClientMessageToAll(ADMIN_COLOR_HD,msj);
+	new query[256];
+	mysql_format(g_SQL, query, sizeof(query),"INSERT INTO `banlistesi`(`Banlanan`, `Banlayan`,`BanDurumu`,) VALUES ('%s', '%s', '1')", getName(xID),getName(playerid));
+	mysql_tquery(g_SQL, query, "","");
+	SetPVarInt(xID,"BanlandimAMK",1);
+	new __ping = GetPlayerPing(xID) + 150;
+	SetTimerEx("Sutla",(__ping > MAX_PING ? MAX_PING : __ping),false,"d",xID);
+}
+}
+if(dialogid == KICK)
+{
+if(response)
+{
+	if(PlayerInfo[playerid][pAdminLevel] < 1) return SendClientMessage(playerid, ERROR_COLOR_HD, "Bu komutu kullanabilmek için 3 level ve üstü admin olmalısın.");
+	new ID, str[250];
+	ID = strval(inputtext);
+	if(!IsPlayerConnected(ID)) return SendClientMessage(playerid,ERROR_COLOR_HD,"Sunucuda böyle bir ID yok !");
+	if(playerid == ID) return SendClientMessage(playerid,ERROR_COLOR_HD,"Kendinimi atacaksın ?");
+	if(PlayerInfo[playerid][pAdminLevel] < PlayerInfo[ID][pAdminLevel]) return SendClientMessage(playerid, ERROR_COLOR_HD, "Yüksek level adminleri atamazsın !");
+	format(str,sizeof(str),"<< BOT >> Yetkili %s, oyuncu %s sunucudan attı.", getName(playerid), getName(ID));
+	SendClientMessageToAll(ADMIN_COLOR_HD,str);
+	new __ping = GetPlayerPing(ID) + 150;
+	SetTimerEx("Sutla",(__ping > MAX_PING ? MAX_PING : __ping),false,"d",ID);
+
+}
+}
+if(dialogid == TAKIP)
+{
+if(response)
+{
+	new ID;
+	ID = strval(inputtext);
+	if(!IsPlayerConnected(ID)) return SendClientMessage(playerid,ERROR_COLOR_HD,"Sunucuda böyle bir ID yok !");
+	if(PlayerInfo[playerid][pAdminLevel] < PlayerInfo[ID][pAdminLevel]) return SendClientMessage(playerid, ERROR_COLOR_HD, "Yüksek level adminleri izleyemezsin !");
+	SetPlayerVirtualWorld(playerid,GetPlayerVirtualWorld(ID));
+	SetPlayerInterior(playerid,GetPlayerInterior(ID));
+	Spectating[playerid] = ID;
+	TogglePlayerSpectating(playerid, 1);
+	SetPVarInt(playerid,"IzlemeModuAcik",1);
+	if(IsPlayerInAnyVehicle(playerid))
+	{
+	    SetPVarInt(playerid,"aractayimMi",1);
+	    SetPVarInt(playerid,"izlemeAraci",GetPlayerVehicleID(playerid));
+	    new Float:AracPosum[4];
+	    GetVehiclePos(GetPlayerVehicleID(playerid), AracPosum[0], AracPosum[1], AracPosum[2]);
+	    GetVehicleZAngle(GetPlayerVehicleID(playerid), AracPosum[3]);
+	    SetPVarFloat(playerid,"aracXdeger",AracPosum[0]);
+	    SetPVarFloat(playerid,"aracYdeger",AracPosum[1]);
+	    SetPVarFloat(playerid,"aracZdeger",AracPosum[2]);
+	    SetPVarFloat(playerid,"aracBdeger",AracPosum[3]);
+		SetPVarInt(playerid,"izleInterior",GetPlayerInterior(playerid));
+		SetPVarInt(playerid,"izleWorld",GetPlayerVirtualWorld(playerid));
+	}
+	SetPVarInt(playerid,"aractayimMi",2);
+	new Float:yerPos[4];
+	GetPlayerPos(playerid,yerPos[0],yerPos[1],yerPos[2]);
+	SetPVarFloat(playerid,"yerXdeger",yerPos[0]);
+	SetPVarFloat(playerid,"yerYdeger",yerPos[1]);
+	SetPVarFloat(playerid,"yerZdeger",yerPos[2]);
+	SetPVarFloat(playerid,"yerBdeger",yerPos[3]);
+	if(IsPlayerInAnyVehicle(ID)) PlayerSpectateVehicle(playerid, GetPlayerVehicleID(ID), SPECTATE_MODE_NORMAL);
+	else PlayerSpectatePlayer(playerid, ID, SPECTATE_MODE_NORMAL);
+
+}
+}
+
+if(dialogid == DUYURU)
+{
+if(response)
+{
+new duyuruyazi[250], duyuruyazi2[250];
+format(duyuruyazi2,sizeof duyuruyazi2,"~g~YETKILI ~w~Duyuru Yapti!");
+TextDrawSetString(Textdraw2, duyuruyazi2);
+format(duyuruyazi, sizeof duyuruyazi,"{004225}|| YETKİLİ ||: {faa009}%s",inputtext);
+SendClientMessageToAll(-1,duyuruyazi);
+for(new i = 0; i < MAX_PLAYERS; i++)
+{
+PlayAudioStreamForPlayer(i, "https://k003.kiwi6.com/hotlink/jph0ifv3sh/Bildirim_sesi_-_from_YouTube.mp3");
+}
+}
+}
+/*=========================== [CP} =========================*/
